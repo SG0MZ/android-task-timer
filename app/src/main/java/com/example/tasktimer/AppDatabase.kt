@@ -4,6 +4,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import java.lang.IllegalStateException
 
 private const val TAG = "AppDatabase"
 
@@ -30,7 +31,13 @@ internal class AppDatabase constructor(context: Context): SQLiteOpenHelper(conte
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        TODO("Not yet implemented")
+        Log.d(TAG,"onUpgrade: starts")
+        when(oldVersion) {
+            1 -> {
+//                upgrade logic from version
+            }
+            else -> throw IllegalStateException("onUpgrade() with unknown newVersion: $newVersion")
+        }
     }
 
     companion object : SingletonHolder<AppDatabase,Context>(::AppDatabase)

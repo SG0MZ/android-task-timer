@@ -1,6 +1,7 @@
 package com.example.tasktimer
 
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -11,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import com.example.tasktimer.databinding.ActivityMainBinding
 
+private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -27,6 +29,27 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        val appDatabase = AppDatabase.getInstance(this)
+        val db = appDatabase.readableDatabase
+
+        val cursor = db.rawQuery("SELECT * FROM Tasks",null)
+        Log.d(TAG,"********************")
+
+        cursor.use {
+            while (it.moveToNext()) {
+                with(cursor) {
+                    val id = getLong(0)
+                    val name = getString(1)
+                    val description = getString(2)
+                    val sortOrder = getString(3)
+                    val result = "ID: $id, Name: $name, Description: $description, Sort Order: $sortOrder"
+                    Log.d(TAG,"onCreate: reading data $result")
+                }
+            }
+        }
+
+        Log.d(TAG,"********************")
 
         binding.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
