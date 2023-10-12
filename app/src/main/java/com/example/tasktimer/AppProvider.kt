@@ -153,12 +153,95 @@ class AppProvider: ContentProvider() {
         return returnUri
     }
 
-    override fun delete(p0: Uri, p1: String?, p2: Array<out String>?): Int {
-        TODO("Not yet implemented")
+    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
+        Log.d(TAG,"delete: called with uri $uri")
+        val match = uriMatcher.match(uri)
+        Log.d(TAG,"delete: match is $match")
+
+        val count: Int
+        var selectionCriteria: String
+
+        when(match) {
+            TASKS -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                count = db.delete(TasksContract.TABLE_NAME,selection,selectionArgs)
+            }
+
+            TASKS_ID -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                val id = TasksContract.getId(uri)
+                selectionCriteria = "${TasksContract.Columns.ID} = $id"
+
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += " AND ($selection)"
+                }
+                count = db.delete(TasksContract.TABLE_NAME,selectionCriteria,selectionArgs)
+            }
+
+            TIMINGS -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                count = db.delete(TimingsContract.TABLE_NAME,selection,selectionArgs)
+            }
+
+            TIMINGS_ID -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                val id = TimingsContract.getId(uri)
+                selectionCriteria = "${TimingsContract.Columns.ID} = $id"
+
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += " AND ($selection)"
+                }
+                count = db.delete(TimingsContract.TABLE_NAME,selectionCriteria,selectionArgs)
+            }
+            else -> throw IllegalArgumentException("Unknown uri: $uri")
+        }
+        Log.d(TAG,"Exiting update, returning $count")
+        return count
     }
 
-    override fun update(p0: Uri, p1: ContentValues?, p2: String?, p3: Array<out String>?): Int {
-        TODO("Not yet implemented")
-    }
+    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
+        Log.d(TAG,"query: called with uri $uri")
+        val match = uriMatcher.match(uri)
+        Log.d(TAG,"query: match is $match")
 
+        val count: Int
+        var selectionCriteria: String
+
+        when(match) {
+            TASKS -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                count = db.update(TasksContract.TABLE_NAME,values,selection,selectionArgs)
+            }
+
+            TASKS_ID -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                val id = TasksContract.getId(uri)
+                selectionCriteria = "${TasksContract.Columns.ID} = $id"
+
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += " AND ($selection)"
+                }
+                count = db.update(TasksContract.TABLE_NAME,values,selectionCriteria,selectionArgs)
+            }
+
+            TIMINGS -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                count = db.update(TimingsContract.TABLE_NAME,values,selection,selectionArgs)
+            }
+
+            TIMINGS_ID -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                val id = TimingsContract.getId(uri)
+                selectionCriteria = "${TimingsContract.Columns.ID} = $id"
+
+                if (selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += " AND ($selection)"
+                }
+                count = db.update(TimingsContract.TABLE_NAME,values,selectionCriteria,selectionArgs)
+            }
+            else -> throw IllegalArgumentException("Unknown uri: $uri")
+        }
+        Log.d(TAG,"Exiting update, returning $count")
+        return count
+    }
 }
