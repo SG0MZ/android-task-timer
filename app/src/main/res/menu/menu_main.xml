@@ -3,8 +3,28 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.tasktimer.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/menumain_addTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="Item" />
+    <item
+        android:id="@+id/menumain_showDurations"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="Item" />
+    <item
+        android:id="@+id/menumain_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menumain_showAbout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="Item" />
+    <item
+        android:id="@+id/menumain_generate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="Item" />
 </menu>
