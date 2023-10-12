@@ -40,6 +40,15 @@ class AddEditFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_add_edit, container, false)
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        Log.d(TAG,"onActivityCreated: starts")
+        super.onActivityCreated(savedInstanceState)
+
+        addedit_save.setOnClickListener {
+            listener?.onSaveClicked()
+        }
+    }
+
     override fun onAttach(context: Context) {
         Log.d(TAG,"onAttach: starts")
         super.onAttach(context)

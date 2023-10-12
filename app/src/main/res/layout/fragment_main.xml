@@ -20,6 +20,7 @@
         tools:text="No Task Selected" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fragment"
         android:layout_width="371dp"
         android:layout_height="612dp"
         android:layout_marginStart="16dp"
