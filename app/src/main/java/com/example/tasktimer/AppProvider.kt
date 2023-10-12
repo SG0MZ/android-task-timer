@@ -50,12 +50,12 @@ class AppProvider: ContentProvider() {
         selection: String?,
         selectionArgs: Array<out String>?,
         sortOrder: String?
-    ): Cursor? {
+    ): Cursor {
         Log.d(TAG,"query: called with uri $uri")
         val match = uriMatcher.match(uri)
         Log.d(TAG,"query: match is $match")
 
-        val queryBuilder: SQLiteQueryBuilder = SQLiteQueryBuilder()
+        val queryBuilder = SQLiteQueryBuilder()
 
         when(match) {
             TASKS -> {

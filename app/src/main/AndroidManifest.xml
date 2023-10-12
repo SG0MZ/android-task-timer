@@ -23,6 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="learnprogramming.academy.tasktimer.provider"
+            android:name="learnprogramming.academy.tasktimer.AppProvider"
+            android:exported="false"
+            tools:ignore="MissingClass" />
     </application>
 
 </manifest>

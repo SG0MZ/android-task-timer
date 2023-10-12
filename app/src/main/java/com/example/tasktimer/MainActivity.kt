@@ -1,5 +1,6 @@
 package com.example.tasktimer
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.snackbar.Snackbar
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
+    @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -30,20 +32,24 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        val appDatabase = AppDatabase.getInstance(this)
-        val db = appDatabase.readableDatabase
+        val projection = arrayOf(TasksContract.Columns.TASK_NAME,TasksContract.Columns.TASK_SORT_ORDER)
+        val sortColumn = TasksContract.Columns.TASK_SORT_ORDER
 
-        val cursor = db.rawQuery("SELECT * FROM Tasks",null)
+        val cursor = contentResolver.query(TasksContract.buildUriFromId(2),
+            projection,
+            null,
+            null,
+            sortColumn)
         Log.d(TAG,"********************")
 
         cursor.use {
-            while (it.moveToNext()) {
+            while (it?.moveToNext() == true) {
                 with(cursor) {
-                    val id = getLong(0)
-                    val name = getString(1)
-                    val description = getString(2)
-                    val sortOrder = getString(3)
-                    val result = "ID: $id, Name: $name, Description: $description, Sort Order: $sortOrder"
+//                    val id = getLong(0)
+                    val name = getString(0)
+//                    val description = getString(2)
+                    val sortOrder = getString(1)
+                    val result = "Name: $name, Sort Order: $sortOrder"
                     Log.d(TAG,"onCreate: reading data $result")
                 }
             }
