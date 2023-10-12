@@ -4,6 +4,7 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.UriMatcher
 import android.database.Cursor
+import android.database.SQLException
 import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
 import android.util.Log
@@ -35,6 +36,9 @@ class AppProvider: ContentProvider() {
 
         matcher.addURI(CONTENT_AUTHORITY,TasksContract.TABLE_NAME, TASKS)
         matcher.addURI(CONTENT_AUTHORITY,"${TasksContract.TABLE_NAME}/#", TASKS_ID)
+
+        matcher.addURI(CONTENT_AUTHORITY,TimingsContract.TABLE_NAME, TIMINGS)
+        matcher.addURI(CONTENT_AUTHORITY,"${TimingsContract.TABLE_NAME}/#", TIMINGS_ID)
 
         return matcher
     }
@@ -68,13 +72,14 @@ class AppProvider: ContentProvider() {
                 queryBuilder.appendWhereEscapeString("$taskId")
             }
 
-//            TIMINGS -> queryBuilder.tables = TimingsContract.TABLE_NAME
-//
-//            TIMINGS_ID -> {
-//                queryBuilder.tables = TimingsContract.TABLE_NAME
-//                val timingId = TimingsContract.getId(uri)
-//                queryBuilder.appendWhereEscapeString("${TimingsContract.Columns.ID} = $timingId")
-//            }
+            TIMINGS -> queryBuilder.tables = TimingsContract.TABLE_NAME
+
+            TIMINGS_ID -> {
+                queryBuilder.tables = TimingsContract.TABLE_NAME
+                val timingId = TimingsContract.getId(uri)
+                queryBuilder.appendWhere("${TimingsContract.Columns.ID} = ")
+                queryBuilder.appendWhereEscapeString("$timingId")
+            }
 //
 //            TASK_DURATIONS -> queryBuilder.tables = DurationsContract.TABLE_NAME
 //
@@ -94,12 +99,58 @@ class AppProvider: ContentProvider() {
         return cursor
     }
 
-    override fun getType(p0: Uri): String? {
-        TODO("Not yet implemented")
+    override fun getType(uri: Uri): String? {
+        val match = uriMatcher.match(uri)
+
+        return when(match) {
+            TASKS -> TasksContract.CONTENT_TYPE
+
+            TASKS_ID -> TasksContract.CONTENT_ITEM_TYPE
+
+            TIMINGS -> TimingsContract.CONTENT_TYPE
+
+            TIMINGS_ID -> TimingsContract.CONTENT_ITEM_TYPE
+
+//            TASK_DURATIONS -> DurationsContract.CONTENT_TYPE
+//
+//            TASK_DURATIONS_ID -> DurationsContract.CONTENT_ITEM_TYPE
+
+            else -> throw IllegalArgumentException("unknown Uri: $uri")
+        }
     }
 
-    override fun insert(p0: Uri, p1: ContentValues?): Uri? {
-        TODO("Not yet implemented")
+    fun insert(uri: Uri, values: ContentValues): Uri {
+        Log.d(TAG,"query: called with uri $uri")
+        val match = uriMatcher.match(uri)
+        Log.d(TAG,"query: match is $match")
+
+        val recordId: Long
+        val returnUri: Uri
+
+        when(match) {
+            TASKS -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                recordId = db.insert(TasksContract.TABLE_NAME,null,values)
+                if (recordId != -1L) {
+                    returnUri = TasksContract.buildUriFromId(recordId)
+                } else {
+                    throw SQLException("Failed to insert, Uri was $uri")
+                }
+            }
+
+            TIMINGS -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                recordId = db.insert(TimingsContract.TABLE_NAME,null,values)
+                if (recordId != -1L) {
+                    returnUri = TimingsContract.buildUriFromId(recordId)
+                } else {
+                    throw SQLException("Failed to insert, Uri was $uri")
+                }
+            }
+            else -> throw IllegalArgumentException("Unknown uri: $uri")
+        }
+        Log.d(TAG,"Exiting insert, returning $returnUri")
+        return returnUri
     }
 
     override fun delete(p0: Uri, p1: String?, p2: Array<out String>?): Int {
