@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
 
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d(TAG,"onCreate: starts")
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         mTwoPane = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        Log.d(TAG,"onCreate: twoPane is $mTwoPane")
 
         var fragment = supportFragmentManager.findFragmentById(R.id.task_details_container)
         if (fragment != null) {
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
             task_details_container.visibility = if(mTwoPane) View.INVISIBLE else View.GONE
             mainFragment.view?.visibility = View.VISIBLE
         }
+        Log.d(TAG,"onCreate: finished")
     }
 
     private fun showEditPane() {
@@ -63,6 +66,8 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
         }
         task_details_container.visibility = if (mTwoPane) View.INVISIBLE else View.GONE
         mainFragment.view?.visibility = View.VISIBLE
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -75,10 +80,15 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        return when (item.itemId) {
-            R.id.menumain_settings -> true
-            else -> super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            R.id.menumain_addTask -> taskEditRequest(null)
+            android.R.id.home -> {
+                Log.d(TAG,"onOptionsItemSelected: home button pressed")
+                val fragment = supportFragmentManager.findFragmentById(R.id.task_details_container)
+                removeEditPane(fragment)
+            }
         }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -104,5 +114,15 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
         showEditPane()
 
         Log.d(TAG,"Existing taskEditRequest")
+    }
+
+    override fun onBackPressed() {
+        val fragment = supportFragmentManager.findFragmentById(R.id.task_details_container)
+        if (fragment == null || mTwoPane) {
+            super.onBackPressed()
+        } else {
+            removeEditPane(fragment)
+        }
+
     }
 }
