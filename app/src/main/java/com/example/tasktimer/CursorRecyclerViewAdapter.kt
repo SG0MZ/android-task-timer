@@ -35,7 +35,7 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?):
 
         if (cursor == null || cursor.count == 0) {
             Log.d(TAG,"onBindViewHolder: providing instructions")
-            holder.tli_name.setText("Instructions")
+            holder.tli_name.setText(R.string.instructions_heading)
             holder.tli_description.setText("")
             holder.tli_edit.visibility = View.GONE
             holder.tli_delete.visibility = View.GONE
@@ -58,4 +58,30 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?):
         }
     }
 
+    override fun getItemCount(): Int {
+        Log.d(TAG,"getItemCount: starts")
+        val cursor = cursor
+        val count = if (cursor == null || cursor.count == 0) {
+            1
+        } else {
+            cursor.count
+        }
+        Log.d(TAG,"returning $count")
+        return count
+    }
+
+    fun swapCursor(newCursor: Cursor?): Cursor? {
+        if (newCursor === cursor) {
+            return null
+        }
+        val numItems = itemCount
+        val oldCursor = cursor
+        cursor = newCursor
+        if (newCursor != null) {
+            notifyDataSetChanged()
+        } else {
+            notifyItemRangeRemoved(0,numItems)
+        }
+        return oldCursor
+    }
 }
