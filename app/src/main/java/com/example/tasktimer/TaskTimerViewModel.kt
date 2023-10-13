@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlin.concurrent.thread
 
 private const val TAG = "TaskTimerViewModel"
 
@@ -37,13 +38,25 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
             TasksContract.Columns.TASK_NAME,
             TasksContract.Columns.TASK_DESCRIPTION,
             TasksContract.Columns.TASK_SORT_ORDER)
+
         val sortOrder = "${TasksContract.Columns.TASK_SORT_ORDER}, ${TasksContract.Columns.TASK_NAME}"
-        val cursor = getApplication<Application>().contentResolver.query(
-            TasksContract.CONTENT_URI,
-            projection,null,null,
-            sortOrder
-        )
-        databaseCursor.postValue(cursor)
+
+        thread {
+            val cursor = getApplication<Application>().contentResolver.query(
+                TasksContract.CONTENT_URI,
+                projection,null,null,
+                sortOrder
+            )
+            databaseCursor.postValue(cursor)
+        }
+    }
+
+    fun deleteTask(taskId: Long) {
+        Log.d(TAG,"onCleared: called")
+        thread {
+            getApplication<Application>().contentResolver?.delete(TasksContract.buildUriFromId(taskId),null,null)
+        }
+
     }
 
     override fun onCleared() {
