@@ -2,6 +2,7 @@ package com.example.tasktimer
 
 import android.annotation.SuppressLint
 import android.content.ContentValues
+import android.content.LocusId
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -15,9 +16,11 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavArgs
 import com.example.tasktimer.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity"
+private const val DIALOG_ID_CANCEL_EDIT = 1
 class MainActivity : AppCompatActivity(),
     AddEditFragment.OnSaveClicked,
     MainActivityFragment.OnTaskEdit {
@@ -105,28 +108,43 @@ class MainActivity : AppCompatActivity(),
 
     override fun onSaveClicked() {
         Log.d(TAG,"onSaveClicked: called")
-        var fragment = supportFragmentManager.findFragmentById(R.id.task_details_container)
-        removeEditPane(fragment)
+        removeEditPane(findFragmentById(R.id.task_details_container))
     }
 
     private fun taskEditRequest(task: Task?) {
         Log.d(TAG,"taskEditRequest: starts")
 
-        val newFragment = AddEditFragment.newInstance(task)
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.task_details_container,newFragment)
-            .commit()
+//        val newFragment = AddEditFragment.newInstance(task)
+//        supportFragmentManager.beginTransaction()
+//            .replace(R.id.task_details_container,newFragment)
+//            .commit()
 
         showEditPane()
-
+        replaceFragment(AddEditFragment.newInstance(task),R.id.task_details_container)
         Log.d(TAG,"Existing taskEditRequest")
     }
 
     override fun onBackPressed() {
-        val fragment = supportFragmentManager.findFragmentById(R.id.task_details_container)
+        val fragment = findFragmentById(R.id.task_details_container)
         if (fragment == null || mTwoPane) {
             super.onBackPressed()
         } else {
+//            removeEditPane(fragment)
+            if ((fragment is AddEditFragment) && fragment.isDirty()) {
+                showConfirmationDialog(DIALOG_ID_CANCEL_EDIT,
+                    getString(R.string.cancelEditDialog_message),
+                    R.string.cancelEditDialog_positive_caption,
+                    R.string.cancelEditDialog_negative_caption)
+            } else {
+                removeEditPane(fragment)
+            }
+        }
+    }
+
+    override fun onPositiveDialogResult(dialoId: Int, args: Bundle) {
+        Log.d(TAG,"onPositiveDialogResult: called with dialogId $dialogId")
+        if (dialogId == DIALOG_ID_CANCEL_EDIT) {
+            val fragment = findFragmentById(R.id.task_details_container)
             removeEditPane(fragment)
         }
     }
@@ -134,5 +152,9 @@ class MainActivity : AppCompatActivity(),
     override fun onSaveInstanceState(outState: Bundle) {
         Log.d(TAG,"onSaveInstanceState: called")
         super.onSaveInstanceState(outState)
+    }
+
+    override fun OnTaskEdit(task: Task) {
+        TODO("Not yet implemented")
     }
 }

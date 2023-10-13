@@ -73,6 +73,14 @@ class AddEditFragment : Fragment() {
         return newTask
     }
 
+    fun isDirty(): Boolean {
+        val newTask = taskFromUi()
+        return ((newTask != task) &&
+                (newTask.name.isNotBlank()
+                        || newTask.description.isNotBlank()
+                        || newTask.sortOrder != 0))
+    }
+
     private fun saveTask() {
         val newTask = taskFromUi()
         if (newTask != task) {
