@@ -10,6 +10,8 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlin.concurrent.thread
 
 private const val TAG = "TaskTimerViewModel"
@@ -41,7 +43,7 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
 
         val sortOrder = "${TasksContract.Columns.TASK_SORT_ORDER}, ${TasksContract.Columns.TASK_NAME}"
 
-        thread {
+        GlobalScope.launch {
             val cursor = getApplication<Application>().contentResolver.query(
                 TasksContract.CONTENT_URI,
                 projection,null,null,

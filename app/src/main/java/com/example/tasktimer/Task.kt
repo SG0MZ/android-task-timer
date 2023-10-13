@@ -6,7 +6,7 @@ import android.os.Parcelable
 import androidx.versionedparcelable.VersionedParcelize
 
 @SuppressLint("ParcelCreator")
-class Task(val name: String, val description: String, val sortOrder: Int): Parcelable {
+data class Task(val name: String, val description: String, val sortOrder: Int, var id: Long = 0): Parcelable {
     var id: Long = 0
     override fun describeContents(): Int {
         TODO("Not yet implemented")
