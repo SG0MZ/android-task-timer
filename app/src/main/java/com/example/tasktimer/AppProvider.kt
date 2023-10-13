@@ -241,6 +241,12 @@ class AppProvider: ContentProvider() {
             }
             else -> throw IllegalArgumentException("Unknown uri: $uri")
         }
+
+        if (count > 0) {
+            Log.d(TAG,"update: Setting notifyChange with $uri")
+            context?.contentResolver?.notifyChange(uri,null)
+        }
+
         Log.d(TAG,"Exiting delete, returning $count")
         return count
     }
