@@ -18,7 +18,9 @@ import androidx.fragment.app.Fragment
 import com.example.tasktimer.databinding.ActivityMainBinding
 
 private const val TAG = "MainActivity"
-class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
+class MainActivity : AppCompatActivity(),
+    AddEditFragment.OnSaveClicked,
+    MainActivityFragment.OnTaskEdit {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -89,6 +91,10 @@ class MainActivity : AppCompatActivity(), AddEditFragment.OnSaveClicked {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onTaskEdit(task: Task) {
+        taskEditRequest(task)
     }
 
     override fun onSupportNavigateUp(): Boolean {

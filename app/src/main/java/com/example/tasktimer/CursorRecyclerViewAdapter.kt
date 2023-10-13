@@ -10,20 +10,20 @@ import androidx.recyclerview.widget.RecyclerView
 import java.lang.IllegalStateException
 
 class TaskViewHolder(override val containerView: View): RecyclerView.ViewHolder(containerView),LayoutContainer {
-    fun bind(task: Task) {
-        holder.tli_name.text = task.name
-        holder.tli_description.text = task.description
-        holder.tli_edit.visibility = View.VISIBLE
-        holder.tli_delete.visibility = View.VISIBLE
+    fun bind(task: Task, listener: CursorRecyclerViewAdapter.OnTaskClickListener) {
+        tli_name.text = task.name
+        tli_description.text = task.description
+        tli_edit.visibility = View.VISIBLE
+        tli_delete.visibility = View.VISIBLE
 
         tli_edit.setOnClickListener {
-            Log.d(TAG,"edit button tapped. task name is ${task.name}")
+            listener.onEditClick(task)
         }
         tli_delete.setOnClickListener {
-            Log.d(TAG,"delete button tapped. task name is ${task.name}")
+            listener.onDeleteClick(task)
         }
         containerView.setOnLongClickListener {
-            Log.d(TAG,"onLongClick: task name is ${task.name}")
+            listener.onTaskLongClick(task)
             true
         }
     }
@@ -31,8 +31,15 @@ class TaskViewHolder(override val containerView: View): RecyclerView.ViewHolder(
 
 private const val TAG = "CursorRecyclerViewAdapter"
 
-class CursorRecyclerViewAdapter(private var cursor: Cursor?):
+class CursorRecyclerViewAdapter(private var cursor: Cursor?, private val listener: OnTaskClickListener):
     RecyclerView.Adapter<TaskViewHolder>() {
+
+    interface OnTaskClickListener {
+        fun onEditClick(task: Task)
+        fun onDeleteClick(task: Task)
+        fun onTaskLongClick(task: Task)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
         Log.d(TAG,"onCreateViewHolder: new view requested")
         val view = LayoutInflater.from(parent.context).inflate(R.layout.task_list_items,parent,null)
@@ -45,7 +52,6 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?):
 
     @SuppressLint("Range")
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        Log.d(TAG,"onBindViewHolder: starts")
 
         val cursor = cursor
 
@@ -72,7 +78,6 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?):
     }
 
     override fun getItemCount(): Int {
-        Log.d(TAG,"getItemCount: starts")
         val cursor = cursor
         val count = if (cursor == null || cursor.count == 0) {
             1
