@@ -13,7 +13,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 
 private const val TAG = "MainActivityFragment"
-class MainActivityFragment: Fragment(), CursorRecyclerViewAdapter.OnTaskClickListener {
+class MainActivityFragment: Fragment(),
+    CursorRecyclerViewAdapter.OnTaskClickListener {
 
     interface OnTaskEdit {
         fun OnTaskEdit(task: Task)
@@ -66,7 +67,32 @@ class MainActivityFragment: Fragment(), CursorRecyclerViewAdapter.OnTaskClickLis
         viewModel.deleteTask(task.id)
     }
 
+    override fun onDeleteClick(task: Task) {
+        val args = Bundle().apply {
+            putInt(DIALOG_ID,DIALOG_ID_DELETE)
+            putString(DIALOG_MESSAGE,getString(R.string.deldiag_message,task.id,task,name))
+            putInt(DIALOG_POSITIVE_RID,R.string.deldiag_positive_caption)
+        }
+        val dialog = AppDialog()
+        dialog.arguments = args
+        dialog.show(childFragmentManager,null)
+    }
+
     override fun onTaskLongClick(task: Task) {
         TODO("Not yet implemented")
+    }
+
+    override fun onPositiveDialogResult(dialogId: Int, args: Bundle) {
+        Log.d(TAG,"onPositiveDialogResult: called with id $dialogId")
+        if (dialogId == DIALOG_ID_DELETE) {
+            val taskId = args.getLong(DIALOG_TASK_ID)
+            if (BuildConfig.DEBUG && taskId == 0L) throw AssertionError("Task ID is zero")
+            viewModel.deleteTask(taskId)
+        }
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        Log.d(TAG,"onViewStateRestored: called")
+        super.onViewStateRestored(savedInstanceState)
     }
 }

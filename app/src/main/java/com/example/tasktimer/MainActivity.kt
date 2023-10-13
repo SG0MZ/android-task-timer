@@ -129,6 +129,10 @@ class MainActivity : AppCompatActivity(),
         } else {
             removeEditPane(fragment)
         }
+    }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        Log.d(TAG,"onSaveInstanceState: called")
+        super.onSaveInstanceState(outState)
     }
 }
