@@ -1,9 +1,12 @@
 package com.example.tasktimer
 
 import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.ContentValues
+import android.content.Intent
 import android.content.LocusId
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import com.google.android.material.snackbar.Snackbar
@@ -16,6 +19,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavArgs
@@ -119,9 +123,30 @@ class MainActivity : AppCompatActivity(),
         aboutDialog = builder.setView(messageView).create()
         aboutDialog?.setCanceledOnTouchOutside(true)
 
+        messageView.setOnClickListener {
+            Log.d(TAG,"Entering messageView.onClick")
+            if (aboutDialog != null && aboutDialog?.isShowing == true) {
+                aboutDialog?.dismiss()
+            }
+        }
+
         val aboutVersion = messageView.findViewById(R.id.about_version) as TextView
 //        aboutVersion.text = BuildConfig.VERSION_NAME
         aboutVersion.text = BuildConfig.VERSION_NAME
+
+        val aboutUrl: TextView? = messageView.findViewById(R.id.about_url)
+        aboutUrl?.setOnClickListener {v ->
+            val intent = Intent(Intent.ACTION_VIEW)
+            val s = (v as TextView).text.toString()
+            intent.data = Uri.parse(s)
+            try {
+                startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Toast.makeText(this@MainActivity,R.string.about_url_error,Toast.LENGTH_LONG).show()
+            }
+
+        }
+
         aboutDialog?.show()
     }
 

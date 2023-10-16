@@ -45,4 +45,9 @@
     </string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="about_weblink">Instructions available at</string>
+    <string name="about_url"><u>"https://www.learnprogramming.academy</u></string>
+    <string name="about_email">For support, email tasktimer@learnprogramming.academy</string>
+    <string name="about_credits">Icon derived from <b>analog clock</b>at openclipart.org by</string>
+    <string name="about_url_error">No browser application found, cannot visit world-wide web</string>
 </resources>
