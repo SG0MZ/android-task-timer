@@ -94,11 +94,22 @@ class MainActivity : AppCompatActivity(),
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.menumain_addTask -> taskEditRequest(null)
+            R.id.menumain_settings -> {
+                val dialog = SettingsDialog()
+                dialog.show(supportFragmentManager,null)
+            }
             R.id.menumain_showAbout -> showAboutDialog()
             android.R.id.home -> {
                 Log.d(TAG,"onOptionsItemSelected: home button pressed")
                 val fragment = supportFragmentManager.findFragmentById(R.id.task_details_container)
-                removeEditPane(fragment)
+                if ((fragment is AddEditFragment) && fragment.isDirty()) {
+                    showConfirmationDialog(DIALOG_ID_CANCEL_EDIT,
+                        "You have unsaved changes. Do you want to abandon you ...",
+                        "Abandon changes",
+                        "Continue editing")
+                } else {
+                    removeEditPane(fragment)
+                }
             }
         }
         return super.onOptionsItemSelected(item)
