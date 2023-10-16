@@ -44,6 +44,8 @@ class AppProvider: ContentProvider() {
 
         matcher.addURI(CONTENT_AUTHORITY,CurrentTimingContract.TABLE_NAME, CURRENT_TIMINGS)
 
+        matcher.addURI(CONTENT_AUTHORITY,DurationsContract.TABLE_NAME, TASK_DURATIONS)
+
         return matcher
     }
 
@@ -121,9 +123,7 @@ class AppProvider: ContentProvider() {
 
             CURRENT_TIMINGS -> CurrentTimingContract.CONTENT_ITEM_TYPE
 
-//            TASK_DURATIONS -> DurationsContract.CONTENT_TYPE
-//
-//            TASK_DURATIONS_ID -> DurationsContract.CONTENT_ITEM_TYPE
+            TASK_DURATIONS -> DurationsContract.CONTENT_TYPE
 
             else -> throw IllegalArgumentException("unknown Uri: $uri")
         }
