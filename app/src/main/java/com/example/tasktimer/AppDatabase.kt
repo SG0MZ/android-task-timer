@@ -9,7 +9,7 @@ import java.lang.IllegalStateException
 private const val TAG = "AppDatabase"
 
 private const val DATABASE_NAME = "TaskTimer.db"
-private const val DATABASE_VERSION = 2
+private const val DATABASE_VERSION = 3
 
 internal class AppDatabase constructor(context: Context): SQLiteOpenHelper(context, DATABASE_NAME,null,
     DATABASE_VERSION) {
@@ -39,6 +39,7 @@ internal class AppDatabase constructor(context: Context): SQLiteOpenHelper(conte
         db.execSQL(sSQLTiming)
 
         addTimingsTable(db)
+        addCurrentTimingView(db)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -46,6 +47,10 @@ internal class AppDatabase constructor(context: Context): SQLiteOpenHelper(conte
         when(oldVersion) {
             1 -> {
                 addTimingsTable(db)
+                addCurrentTimingView(db)
+            }
+            2 -> {
+                addCurrentTimingView(db)
             }
             else -> throw IllegalStateException("onUpgrade() with unknown newVersion: $newVersion")
         }

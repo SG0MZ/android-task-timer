@@ -35,6 +35,7 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
     init {
         Log.d(TAG,"TaskTimerViewModel: created")
         getApplication<Application>().contentResolver.registerContentObserver(TasksContract.CONTENT_URI,true,contentObserver)
+        currentTiming = retrieveTiming()
         loadTasks()
     }
 
@@ -139,6 +140,35 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
                 getApplication<Application>().contentResolver.update(TimingsContract.buildUriFromId(currentTiming.id),values,null)
             }
         }
+    }
+
+    @SuppressLint("Range")
+    private fun retrieveTiming(): Timing? {
+        Log.d(TAG,"retrieveTiming starts")
+        val timing: Timing?
+
+        val timingCursor: Cursor? = getApplication<Application>().contentResolver.query(
+            CurrentTimingContract.CONTENT_URI,
+            null,
+            null,
+            null,
+            null)
+
+        if (timingCursor != null && timingCursor.moveToFirst()) {
+            val id = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TIMING_ID))
+            val taskId = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TASK_ID))
+            val startTime = timingCursor.getLong(timingCursor.getColumnIndex(CurrentTimingContract.Columns.START_TIME))
+            val name = timingCursor.getString(timingCursor.getColumnIndex(CurrentTimingContract.Columns.TASK_NAME))
+            timing = Timing(taskId,startTime,id)
+
+            taskTiming.value = name
+        } else {
+            timing = null
+        }
+
+        timingCursor?.close()
+        Log.d(TAG,"retrieveTiming returning")
+        return timing
     }
 
     override fun onCleared() {
