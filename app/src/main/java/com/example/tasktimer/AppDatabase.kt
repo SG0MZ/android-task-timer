@@ -28,6 +28,15 @@ internal class AppDatabase constructor(context: Context): SQLiteOpenHelper(conte
         """.replaceIndent(" ")
         Log.d(TAG,sSQL)
         db?.execSQL(sSQL)
+
+        val sSQLTiming = """CREATE TABLE ${TimingsContract.TABLE_NAME} (
+            ${TimingsContract.Columns.ID} INTEGER PRIMARY KEY NOT NULL,
+            ${TimingsContract.Columns.TIMING_TASK_ID} INTEGER NOT NULL,
+            ${TimingsContract.Columns.TIMING_START_TIME} INTEGER,
+            ${TimingsContract.Columns.TIMING_DURATION} INTEGER);
+        """.replaceIndent(" ")
+        Log.d(TAG,sSQL)
+        db?.execSQL(sSQL)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
