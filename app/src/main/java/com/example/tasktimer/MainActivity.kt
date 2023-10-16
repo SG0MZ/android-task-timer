@@ -22,6 +22,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavArgs
 import com.example.tasktimer.databinding.ActivityMainBinding
 
@@ -37,6 +39,11 @@ class MainActivity : AppCompatActivity(),
     private var mTwoPane = false
 
     private var aboutDialog: AlertDialog? = null
+
+    private val viewModel by lazy {
+        ViewModelProviders.of(this).get(TaskTimerViewModel::class.java)
+    }
+
     @SuppressLint("ResourceType")
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"onCreate: starts")
@@ -61,6 +68,14 @@ class MainActivity : AppCompatActivity(),
             task_details_container.visibility = if(mTwoPane) View.INVISIBLE else View.GONE
             mainFragment.view?.visibility = View.VISIBLE
         }
+        viewModel.timing.observe(this,Observer<String> {
+            timing ->
+                current_task.text = if(timing != null) {
+                    getString(R.string.timing_message)
+                } else {
+                    getString(R.string.no_task_message)
+                }
+        })
         Log.d(TAG,"onCreate: finished")
     }
 

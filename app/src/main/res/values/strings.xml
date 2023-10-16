@@ -50,4 +50,6 @@
     <string name="about_email">For support, email tasktimer@learnprogramming.academy</string>
     <string name="about_credits">Icon derived from <b>analog clock</b>at openclipart.org by</string>
     <string name="about_url_error">No browser application found, cannot visit world-wide web</string>
+    <string name="timing_message">Currently timing %1$s</string>
+    <string name="no_task_message">No task being timed</string>
 </resources>

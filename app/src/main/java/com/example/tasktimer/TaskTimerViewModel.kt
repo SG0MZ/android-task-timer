@@ -26,14 +26,21 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
         }
     }
 
+    private var currentTiming: Timing? = null
+
     private val databaseCursor = MutableLiveData<Cursor>()
     val cursor: LiveData<Cursor>
         get() = databaseCursor
 
     init {
         Log.d(TAG,"TaskTimerViewModel: created")
+        getApplication<Application>().contentResolver.registerContentObserver(TasksContract.CONTENT_URI,true,contentObserver)
         loadTasks()
     }
+
+    private val taskTiming = MutableLiveData<String>()
+    val timing: LiveData<String>
+        get() = taskTiming
 
     @SuppressLint("NullSafeMutableLiveData")
     private fun loadTasks() {
@@ -86,7 +93,52 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
         thread {
             getApplication<Application>().contentResolver?.delete(TasksContract.buildUriFromId(taskId),null,null)
         }
+    }
 
+    fun timeTask(task: Task) {
+        Log.d(TAG,"timeTask: called")
+        val timingRecord = currentTiming
+
+        if (timingRecord == null) {
+            currentTiming = Timing(task.id)
+            saveTiming(currentTiming!!)
+        } else {
+            timingRecord.setDuration()
+            saveTiming(timingRecord)
+            if (task.id == timingRecord.taskId) {
+                currentTiming = null
+            } else {
+                val newTiming = Timing(task.id)
+                saveTiming(newTiming)
+                currentTiming = newTiming
+            }
+        }
+        taskTiming.value = if (currentTiming != null) task.name else null
+    }
+
+    private fun saveTiming(currentTiming: Timing) {
+        Log.d(TAG,"saveTiming: called")
+
+        val inserting = (currentTiming.duration == 0L)
+
+        val values = ContentValues().apply {
+            if (inserting) {
+                put(TimingsContract.Columns.TIMING_TASK_ID, currentTiming.taskId)
+                put(TimingsContract.Columns.TIMING_START_TIME, currentTiming.startTime)
+            }
+            put(TimingsContract.Columns.TIMING_DURATION, currentTiming.duration)
+        }
+
+        GlobalScope.launch {
+            if (inserting) {
+                val uri = getApplication<Application>().contentResolver.insert(TimingsContract.CONTENT_URI,values)
+                if (uri != null) {
+                    currentTiming.id = TimingsContract.getId(uri)
+                }
+            } else {
+                getApplication<Application>().contentResolver.update(TimingsContract.buildUriFromId(currentTiming.id),values,null)
+            }
+        }
     }
 
     override fun onCleared() {
