@@ -29,12 +29,15 @@ class AddEditFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var task: Task? = null
     private var listener: OnSaveClicked? = null
-    private val viewModel by lazy { ViewModelProviders.of(activity!!).get(TaskTimerViewModel::class.java) }
+//    private val viewModel by lazy { ViewModelProviders.of(activity!!).get(TaskTimerViewModel::class.java) }
+    private val viewModel: DurationsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"onCreate: starts")
         super.onCreate(savedInstanceState)
         task = arguments?.getParcelable(ARG_TASK)
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(
@@ -111,7 +114,7 @@ class AddEditFragment : Fragment() {
         if (context is OnSaveClicked) {
             listener = context
         } else {
-            throw RuntimeException(context.toString() + " must implement OnSaveClicked")
+            throw RuntimeException("$context must implement OnSaveClicked")
         }
     }
 
@@ -119,6 +122,8 @@ class AddEditFragment : Fragment() {
         Log.d(TAG,"onDetach: starts")
         super.onDetach()
         listener = null
+
+        viewModel.stopEditing()
     }
 
     interface OnSaveClicked {

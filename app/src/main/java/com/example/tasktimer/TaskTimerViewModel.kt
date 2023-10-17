@@ -13,7 +13,10 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewmodel.viewModelFactory
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.concurrent.thread
 
@@ -61,6 +64,8 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
     val timing: LiveData<String>
         get() = taskTiming
 
+    var editedTaskId = 0L
+
     @SuppressLint("NullSafeMutableLiveData")
     private fun loadTasks() {
         val projection = arrayOf(TasksContract.Columns.ID,
@@ -70,7 +75,7 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
 
         val sortOrder = "${TasksContract.Columns.TASK_SORT_ORDER}, ${TasksContract.Columns.TASK_NAME}"
 
-        GlobalScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val cursor = getApplication<Application>().contentResolver.query(
                 TasksContract.CONTENT_URI,
                 projection,null,null,
@@ -89,7 +94,7 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
             values.put(TasksContract.Columns.TASK_SORT_ORDER,task.sortOrder)
 
             if (task.id == 0L) {
-                GlobalScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     Log.d(TAG,"saveTask: adding new task")
                     val uri = getApplication<Application>().contentResolver?.insert(TasksContract.CONTENT_URI,values)
                     if (uri != null) {
@@ -98,7 +103,7 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
                     }
                 }
             } else {
-                GlobalScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     Log.d(TAG,"saveTask: updating task")
                     getApplication<Application>().contentResolver?.update(TasksContract.buildUriFromId(task.id),values,null,null)
                 }
@@ -148,7 +153,7 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
             put(TimingsContract.Columns.TIMING_DURATION, currentTiming.duration)
         }
 
-        GlobalScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (inserting) {
                 val uri = getApplication<Application>().contentResolver.insert(TimingsContract.CONTENT_URI,values)
                 if (uri != null) {
@@ -201,5 +206,7 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
         getApplication<Application>().contentResolver.unregisterContentObserver(contentObserver)
 
         settings.unregisterOnSharedPreferenceChangeListener(settingsListener)
+
+        databaseCursor.value?.close()
     }
 }

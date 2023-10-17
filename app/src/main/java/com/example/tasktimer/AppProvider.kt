@@ -10,6 +10,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.navigation.NavArgs
 import java.lang.IllegalArgumentException
+import java.lang.NullPointerException
 
 private const val TAG = "AppProvider"
 
@@ -127,6 +128,12 @@ class AppProvider: ContentProvider() {
 
             else -> throw IllegalArgumentException("unknown Uri: $uri")
         }
+        val context = context ?: throw NullPointerException("In query function. Context can't be null here")
+        val db = AppDatabase.getInstance(context).readableDatabase
+        val cursor = queryBuilder.query(db,projection,selection,selectionArgs,null,null,sortOrder)
+        Log.d(TAG,"query: rows in returned cursor = ${cursor.count}")
+
+        return cursor
     }
 
     fun insert(uri: Uri, values: ContentValues): Uri {
@@ -136,6 +143,8 @@ class AppProvider: ContentProvider() {
 
         val recordId: Long
         val returnUri: Uri
+
+        val context = context ?: throw NullPointerException("In insert function. Context can't be null here")
 
         when(match) {
             TASKS -> {

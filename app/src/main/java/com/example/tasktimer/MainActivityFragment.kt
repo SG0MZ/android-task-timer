@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -20,7 +21,9 @@ class MainActivityFragment: Fragment(),
         fun OnTaskEdit(task: Task)
     }
 
-    private val viewModel by lazy { ViewModelProviders.of(activity!!).get(TaskTimerViewModel::class.java) }
+//    private val viewModel by lazy { ViewModelProviders.of(activity!!).get(TaskTimerViewModel::class.java) }
+    private val viewModel: DurationsViewModel by viewModels()
+
     private val mAdapter = CursorRecyclerViewAdapter(null,this)
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -68,14 +71,18 @@ class MainActivityFragment: Fragment(),
     }
 
     override fun onDeleteClick(task: Task) {
-        val args = Bundle().apply {
-            putInt(DIALOG_ID,DIALOG_ID_DELETE)
-            putString(DIALOG_MESSAGE,getString(R.string.deldiag_message,task.id,task,name))
-            putInt(DIALOG_POSITIVE_RID,R.string.deldiag_positive_caption)
+        if (task.id == viewModel.editedTaskId) {
+            Toast.makeText(context,getString(R.string.delete_edited_task),Toast.LENGTH_SHORT).show()
+        } else {
+            val args = Bundle().apply {
+                putInt(DIALOG_ID,DIALOG_ID_DELETE)
+                putString(DIALOG_MESSAGE,getString(R.string.deldiag_message,task.id,task,name))
+                putInt(DIALOG_POSITIVE_RID,R.string.deldiag_positive_caption)
+            }
+            val dialog = AppDialog()
+            dialog.arguments = args
+            dialog.show(childFragmentManager,null)
         }
-        val dialog = AppDialog()
-        dialog.arguments = args
-        dialog.show(childFragmentManager,null)
     }
 
     override fun onTaskLongClick(task: Task) {

@@ -229,6 +229,11 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
+    override fun onStart() {
+        Log.d(TAG,"onStart: called")
+        super.onStart()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         Log.d(TAG,"onSaveInstanceState: called")
         super.onSaveInstanceState(outState)

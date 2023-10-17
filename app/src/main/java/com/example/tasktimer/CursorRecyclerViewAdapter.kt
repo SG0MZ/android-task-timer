@@ -66,14 +66,16 @@ class CursorRecyclerViewAdapter(private var cursor: Cursor?, private val listene
                 throw IllegalStateException("Couldn't move cursor to position $position")
             }
 
-            val task = Task(
-                cursor.getString(cursor.getColumnIndex(TasksContract.Columns.TASK_NAME)),
-                cursor.getString(cursor.getColumnIndex(TasksContract.Columns.TASK_DESCRIPTION)),
-                cursor.getInt(cursor.getColumnIndex(TasksContract.Columns.TASK_SORT_ORDER))
-            )
-            task.id = cursor.getLong(cursor.getColumnIndex(TasksContract.Columns.ID))
+            with(cursor) {
+                val task = Task(
+                    cursor.getString(cursor.getColumnIndex(TasksContract.Columns.TASK_NAME)),
+                    cursor.getString(cursor.getColumnIndex(TasksContract.Columns.TASK_DESCRIPTION)),
+                    cursor.getInt(cursor.getColumnIndex(TasksContract.Columns.TASK_SORT_ORDER))
+                )
+                task.id = cursor.getLong(cursor.getColumnIndex(TasksContract.Columns.ID))
 
-            holder.bind(task)
+                holder.bind(task)
+            }
         }
     }
 

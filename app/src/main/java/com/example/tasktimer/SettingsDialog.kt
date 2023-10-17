@@ -27,7 +27,7 @@ class SettingsDialog: AppCompatDialogFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(TAG,"onCreate: called")
         super.onCreate(savedInstanceState)
-        setStyle(AppCompatDialogFragment.STYLE_NORMAL,R.style.SettingsDialogStyle)
+        setStyle(STYLE_NORMAL,R.style.SettingsDialogStyle)
         retainInstance = true
     }
 

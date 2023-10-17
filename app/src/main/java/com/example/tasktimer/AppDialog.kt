@@ -44,7 +44,7 @@ class AppDialog: AppCompatDialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         Log.d(TAG,"onCreateDialog called")
-        val builder = AlertDialog.Builder(context!!)
+        val builder = AlertDialog.Builder(requireContext())
 
         val arguments = arguments
         val dialogId: Int

@@ -29,7 +29,8 @@ class DurationsReport : AppCompatActivity(),
     AppDialog.DialogEvents,
     View.OnClickListener {
 
-    private val viewModel by lazy { ViewModelProviders.of(this).get(DurationsViewModel::class.java)}
+//    private val viewModel by lazy { ViewModelProviders.of(this).get(DurationsViewModel::class.java)}
+    private val viewModel: DurationsViewModel by viewModels()
 
     private val reportAdapter by lazy { DurationsRVAdapter(this, null) }
 

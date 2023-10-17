@@ -14,6 +14,8 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -190,7 +192,7 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
         }
         Log.d(TAG, "order is $order")
 
-        GlobalScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val cursor = getApplication<Application>().contentResolver.query(
                 DurationsContract.CONTENT_URI,
                 null,
@@ -211,7 +213,7 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
 
         Log.d(TAG, "Deleting records prior to $longDate")
 
-        GlobalScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getApplication<Application>().contentResolver.delete(TimingsContract.CONTENT_URI, selection, selectionArgs)
         }
 
