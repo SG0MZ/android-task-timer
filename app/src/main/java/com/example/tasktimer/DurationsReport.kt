@@ -3,6 +3,8 @@ package com.example.tasktimer
 import android.database.Cursor
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -59,6 +61,40 @@ class DurationsReport : AppCompatActivity(),
             R.id.td_start_heading -> viewModel.sortOrder = SortColumns.START_DATE
             R.id.td_duration_heading -> viewModel.sortOrder = SortColumns.DURATION
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_report,menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+
+        when(id) {
+            R.id.rm_filter_period -> {
+                viewModel.toggleDisplayWeek()
+                invalidateOptionsMenu()
+                return true
+            }
+            R.id.rm_filter_date -> {}
+            R.id.rm_delete -> {}
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
+        val item = menu.findItem(R.id.rm_filter_period)
+        if (item != null) {
+            if (viewModel.displayWeek) {
+                item.setIcon(R.drawable.ic_filter_1_black_24dp)
+                item.setTitle(R.string.rm_title_filter_day)
+            } else {
+                item.setIcon(R.drawable.ic_filter_7_black_24dp)
+                item.setTitle(R.string.rm_title_filter_week)
+            }
+        }
+        return super.onPrepareOptionsMenu(menu)
     }
 
     private fun loadData() {
