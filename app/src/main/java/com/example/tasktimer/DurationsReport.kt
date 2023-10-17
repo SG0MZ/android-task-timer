@@ -3,8 +3,11 @@ package com.example.tasktimer
 import android.database.Cursor
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -14,25 +17,13 @@ import com.example.tasktimer.databinding.ActivityDurationsReportBinding
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-enum class SortColumns {
-    NAME,
-    DESCRIPTION,
-    START_DATE,
-    DURATION
-}
-
 private const val TAG = "DurationsReport"
 
-class DurationsReport : AppCompatActivity() {
+class DurationsReport : AppCompatActivity(),
+    View.OnClickListener {
 
+    private val viewModel by lazy { ViewModelProviders.of(this).get(DurationsViewModel::class.java) }
     private val reportAdapter by lazy { DurationsRVAdapter(this,null)}
-
-    var databaseCursor: Cursor? = null
-
-    var sortOrder = SortColumns.NAME
-
-    private val selection = "${DurationsContract.Columns.START_TIME} Between ? and ?"
-    private var selectionArgs = arrayOf("155668800","1559347199")
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityDurationsReportBinding
@@ -52,6 +43,22 @@ class DurationsReport : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         td_list.layoutManager = LinearLayoutManager(this)
         td_list.adapter = reportAdapter
+
+        viewModel.cursor.observe(this,Observer { cursor -> reportAdapter.swapCursor(cursor)?.close() })
+
+        td_name_heading.setOnClickListener(this)
+        td_description_heading?.setOnClickListener(this)
+        td_start_heading.setOnClickListener(this)
+        td_duration_heading.setOnClickListener(this)
+    }
+
+    override fun onClick(v: View?) {
+        when(v.id) {
+            R.id.td_name_heading -> viewModel.sortOrder = SortColumns.NAME
+            R.id.td_description_heading -> viewModel.sortOrder = SortColumns.DESCRIPTION
+            R.id.td_start_heading -> viewModel.sortOrder = SortColumns.START_DATE
+            R.id.td_duration_heading -> viewModel.sortOrder = SortColumns.DURATION
+        }
     }
 
     private fun loadData() {
