@@ -52,4 +52,5 @@
     <string name="about_url_error">No browser application found, cannot visit world-wide web</string>
     <string name="timing_message">Currently timing %1$s</string>
     <string name="no_task_message">No task being timed</string>
+    <string name="title_activity_durations_report">DurationsReport</string>
 </resources>

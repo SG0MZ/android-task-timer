@@ -13,6 +13,11 @@
         android:theme="@style/Theme.TaskTimer"
         tools:targetApi="31">
         <activity
+            android:name=".DurationsReport"
+            android:exported="false"
+            android:label="@string/title_activity_durations_report"
+            android:theme="@style/Theme.TaskTimer" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -23,9 +28,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
-            android:authorities="learnprogramming.academy.tasktimer.provider"
             android:name="learnprogramming.academy.tasktimer.AppProvider"
+            android:authorities="learnprogramming.academy.tasktimer.provider"
             android:exported="false"
             tools:ignore="MissingClass" />
     </application>
