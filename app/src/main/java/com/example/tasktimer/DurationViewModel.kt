@@ -18,6 +18,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import learnprogramming.academy.tasktimer.ParametersContract
 import java.util.*
 
 /**
@@ -101,6 +102,7 @@ class DurationsViewModel (application: Application) : AndroidViewModel(applicati
         calendar.firstDayOfWeek = firstDayOfWeek
 
         application.contentResolver.registerContentObserver(TimingsContract.CONTENT_URI,true,contentObserver)
+        application.contentResolver.registerContentObserver(ParametersContract.CONTENT_URI,true,contentObserver)
 
         val broadcastFilter = IntentFilter(Intent.ACTION_TIMEZONE_CHANGED)
         broadcastFilter.addAction(Intent.ACTION_LOCALE_CHANGED)

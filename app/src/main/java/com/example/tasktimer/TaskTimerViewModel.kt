@@ -13,11 +13,14 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.media3.common.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import learnprogramming.academy.tasktimer.ParametersContract
 import kotlin.concurrent.thread
 
 private const val TAG = "TaskTimerViewModel"
@@ -32,13 +35,24 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
     }
 
     private val settings = PreferenceManager.getDefaultSharedPreferences(application)
-    private val ignoreLessThan = settings.getInt(SETTINGS_IGNORE_LESS_THAN,
+    private var ignoreLessThan = settings.getInt(SETTINGS_IGNORE_LESS_THAN,
         SETTINGS_DEFAULT_IGNORE_LESS_THAN)
 
     private val settingsListener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
         when (key) {
-            ignoreLessThan = sharedPreferences.getInt(key, SETTINGS_DEFAULT_IGNORE_LESS_THAN)
-                    Log . d (TAG, "settingsListener: now ignoring timings less than $ignoreLessThan")
+            SETTINGS_IGNORE_LESS_THAN -> {
+                ignoreLessThan = sharedPreferences.getInt(key, SETTINGS_DEFAULT_IGNORE_LESS_THAN)
+                Log.d(TAG, "settingsListener: now ignoring timings less than $ignoreLessThan")
+                val values = ContentValues()
+                values.put(parametersContract.Columns.VALUE, ignoreLessThan)
+                viewModelScope.launch { Dispatchers.IO
+                    val uri = getApplication<Application>().contentResolver
+                        .update(ParametersContract.buildUriFromId(ParametersContract.ID_SHORT_TIMING),
+                            values,
+                            null,
+                            null)
+                }
+            }
         }
     }
     }

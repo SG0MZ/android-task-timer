@@ -50,13 +50,19 @@ internal class AppDatabase constructor(context: Context): SQLiteOpenHelper(conte
                 addTimingsTable(db)
                 addCurrentTimingView(db)
                 addDurationsView(db)
+                parameteriseView(db)
             }
             2 -> {
                 addCurrentTimingView(db)
                 addDurationsView(db)
+                parameteriseView(db)
             }
             3 -> {
                 addDurationsView(db)
+                parameteriseView(db)
+            }
+            4 -> {
+                parameteriseView(db)
             }
             else -> throw IllegalStateException("onUpgrade() with unknown newVersion: $newVersion")
         }

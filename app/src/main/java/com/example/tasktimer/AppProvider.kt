@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteQueryBuilder
 import android.net.Uri
 import android.util.Log
 import androidx.navigation.NavArgs
+import learnprogramming.academy.tasktimer.ParametersContract
 import java.lang.IllegalArgumentException
 import java.lang.NullPointerException
 
@@ -26,6 +27,9 @@ private const val CURRENT_TIMINGS = 300
 
 private const val TASK_DURATIONS = 400
 private const val TASK_DURATIONS_ID = 401
+
+private const val PARAMETERS = 500
+private const val PARAMETERS_ID = 501
 
 val CONTENT_AUTHORITY_URI: Uri = Uri.parse("content://$CONTENT_AUTHORITY")
 
@@ -46,6 +50,9 @@ class AppProvider: ContentProvider() {
         matcher.addURI(CONTENT_AUTHORITY,CurrentTimingContract.TABLE_NAME, CURRENT_TIMINGS)
 
         matcher.addURI(CONTENT_AUTHORITY,DurationsContract.TABLE_NAME, TASK_DURATIONS)
+
+        matcher.addURI(CONTENT_AUTHORITY, ParametersContract.TABLE_NAME,PARAMETERS)
+        matcher.addURI(CONTENT_AUTHORITY, "$(ParametersContract.TABLE_NAME)/#",PARAMETERS_ID)
 
         return matcher
     }
@@ -91,14 +98,23 @@ class AppProvider: ContentProvider() {
             CURRENT_TIMINGS -> {
                 queryBuilder.tables = CurrentTimingContract.TABLE_NAME
             }
-//
-//            TASK_DURATIONS -> queryBuilder.tables = DurationsContract.TABLE_NAME
-//
+
+            TASK_DURATIONS -> queryBuilder.tables = DurationsContract.TABLE_NAME
+
 //            TASK_DURATIONS_ID -> {
 //                queryBuilder.tables = DurationsContract.TABLE_NAME
 //                val durationId = DurationsContract.getId(uri)
 //                queryBuilder.appendWhereEscapeString("${DurationsContract.Columns.ID} = $durationId")
 //            }
+
+            PARAMETERS -> queryBuilder.tables = ParametersContract.TABLE_NAME
+
+            PARAMETERS_ID -> {
+                queryBuilder.tables = ParametersContract.TABLE_NAME
+                val parameterId = ParametersContract.getId(uri)
+                queryBuilder.appendWhere("${ParametersContract.Columns.ID} = ")
+                queryBuilder.appendWhereEscapeString("$parameterId")
+            }
 
             else -> throw IllegalArgumentException("Unknown URI: $uri")
         }
@@ -125,6 +141,10 @@ class AppProvider: ContentProvider() {
             CURRENT_TIMINGS -> CurrentTimingContract.CONTENT_ITEM_TYPE
 
             TASK_DURATIONS -> DurationsContract.CONTENT_TYPE
+
+            PARAMETERS -> ParametersContract.CONTENT_TYPE
+
+            PARAMETERS_ID -> ParametersContract.CONTENT_ITEM_TYPE
 
             else -> throw IllegalArgumentException("unknown Uri: $uri")
         }
@@ -256,7 +276,20 @@ class AppProvider: ContentProvider() {
                 if (selection != null && selection.isNotEmpty()) {
                     selectionCriteria += " AND ($selection)"
                 }
-                count = db.update(TimingsContract.TABLE_NAME,values,selectionCriteria,selectionArgs)
+                count =
+                    db.update(TimingsContract.TABLE_NAME, values, selectionCriteria, selectionArgs)
+            }
+
+            PARAMETERS_ID -> {
+                val db = AppDatabase.getInstance(context).writableDatabase
+                val id = ParametersContract.getId(uri)
+                selectionCriteria = "${ParametersContract.Columns.ID} = $id"
+
+                if(selection != null && selection.isNotEmpty()) {
+                    selectionCriteria += " AND ($selection)"
+                }
+
+                count = db.update(ParametersContract.TABLE_NAME, values, selectionCriteria, selectionArgs)
             }
             else -> throw IllegalArgumentException("Unknown uri: $uri")
         }
