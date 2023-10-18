@@ -10,7 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import java.lang.IllegalStateException
 
 class TaskViewHolder(override val containerView: View): RecyclerView.ViewHolder(containerView),LayoutContainer {
+
+    lateinit var task: Task
+
     fun bind(task: Task, listener: CursorRecyclerViewAdapter.OnTaskClickListener) {
+        this.task = task
+
         tli_name.text = task.name
         tli_description.text = task.description
         tli_edit.visibility = View.VISIBLE
@@ -19,9 +24,7 @@ class TaskViewHolder(override val containerView: View): RecyclerView.ViewHolder(
         tli_edit.setOnClickListener {
             listener.onEditClick(task)
         }
-        tli_delete.setOnClickListener {
-            listener.onDeleteClick(task)
-        }
+
         containerView.setOnLongClickListener {
             listener.onTaskLongClick(task)
             true

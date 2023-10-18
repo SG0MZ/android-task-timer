@@ -22,7 +22,9 @@ class AppDialog: AppCompatDialogFragment() {
     private var dialogEvents: DialogEvents? = null
 
     internal interface DialogEvents {
-        fun onPositiveDialogResult(dialogId: Int, args: Bundle)
+        fun onPositiveDialogResult(dialogId: Int, args: Bundle) {}
+        fun onNegativeDialogResult(dialogId: Int, args: Bundle) {}
+        fun onDialogCancelled(dialogId: Int) {}
     }
 
     override fun onAttach(context: Context) {
@@ -43,9 +45,11 @@ class AppDialog: AppCompatDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        Log.d(TAG,"onCreateDialog called")
+        Log.d(TAG, "onCreateDialog called")
+
         val builder = AlertDialog.Builder(requireContext())
 
+        // fix "smart cast to Bundle is impossible, because 'arguments' is a mutable property that could have been changed by this time"
         val arguments = arguments
         val dialogId: Int
         val messageString: String?
@@ -62,7 +66,7 @@ class AppDialog: AppCompatDialogFragment() {
 
             positiveStringId = arguments.getInt(DIALOG_POSITIVE_RID)
             if (positiveStringId == 0) {
-                positiveStringId =  R.id.ok
+                positiveStringId = R.string.ok
             }
             negativeStringId = arguments.getInt(DIALOG_NEGATIVE_RID)
             if (negativeStringId == 0) {
@@ -73,12 +77,13 @@ class AppDialog: AppCompatDialogFragment() {
         }
 
         return builder.setMessage(messageString)
-            .setPositiveButton(positiveStringId) {
-                dialogInterface, which ->
-                    dialogEvents?.onPositiveDialogResult(dialogId,arguments)
+            .setPositiveButton(positiveStringId) { _, _ ->
+                // callback positive result function
+                dialogEvents?.onPositiveDialogResult(dialogId, arguments)
             }
-            .setNegativeButton(negativeStringId) {
-                dialogInterface, which ->
+            .setNegativeButton(negativeStringId) { dialogInterface, which ->
+                // callback negative result function, if you want to implement it.
+                 dialogEvents?.onNegativeDialogResult(dialogId, arguments)
             }
             .create()
     }
@@ -91,7 +96,8 @@ class AppDialog: AppCompatDialogFragment() {
 
     override fun onCancel(dialog: DialogInterface) {
         Log.d(TAG,"onCancel called")
-        val dialogId = arguments!!.getInt(DIALOG_ID)
+        val dialogId = requireArguments().getInt(DIALOG_ID)
+        dialogEvents?.onDialogCancelled(dialogId)
     }
 
     override fun onDismiss(dialog: DialogInterface) {

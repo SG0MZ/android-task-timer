@@ -114,8 +114,12 @@ class TaskTimerViewModel(application: Application): AndroidViewModel(application
 
     fun deleteTask(taskId: Long) {
         Log.d(TAG,"onCleared: called")
-        thread {
+        viewModelScope.launch(Dispatchers.IO) {
             getApplication<Application>().contentResolver?.delete(TasksContract.buildUriFromId(taskId),null,null)
+        }
+        if (currentTiming?.taskId == taskId) {
+            currentTiming = null
+            taskTiming.value = null
         }
     }
 
